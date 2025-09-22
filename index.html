@@ -1,490 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinematic Poster Generator | AI Studio</title>
-    <style>
-        :root {
-            --primary: #4285F4;
-            --primary-dark: #3367D6;
-            --secondary: #34A853;
-            --accent: #FBBC05;
-            --danger: #EA4335;
-            --light: #F8F9FA;
-            --dark: #202124;
-            --gray: #5F6368;
-            --border: #DADCE0;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --radius: 8px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinematic Poster Generator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4f46e5',
+          }
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .app-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        @media (max-width: 1024px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .panel {
-            background: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-        }
-        
-        .panel-title {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .upload-area {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-        }
-        
-        .upload-area:hover {
-            border-color: var(--primary);
-            background-color: rgba(66, 133, 244, 0.05);
-        }
-        
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn:disabled {
-            background-color: var(--gray);
-            cursor: not-allowed;
-        }
-        
-        .api-key-section {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .api-key-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin: 10px 0;
-        }
-        
-        .generated-area {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .poster-thumbnail {
-            position: relative;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            aspect-ratio: 3/4;
-            background-color: #f0f0f0;
-        }
-        
-        .poster-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .poster-actions {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .action-btn {
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 5px;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background: var(--secondary);
-            color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            z-index: 1001;
-            transform: translateX(150%);
-            transition: transform 0.3s;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.error {
-            background: var(--danger);
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      }
+    }
+  </script>
+  <style>
+    .poster-thumbnail {
+      width: 200px;
+      height: 200px;
+    }
+    .drop-zone {
+      transition: all 0.3s ease;
+    }
+    .drop-zone.drag-over {
+      background-color: #e0e7ff;
+      border-color: #818cf8;
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Cinematic Poster Generator</h1>
-            <p class="subtitle">AI-Powered Premium Poster Creation</p>
-        </header>
-        
-        <!-- API Key Section -->
-        <div class="panel api-key-section">
-            <h2 class="panel-title">
-                <i class="material-icons">vpn_key</i>
-                AI API Configuration
-            </h2>
-            <p><strong>Step 1:</strong> Get your FREE Hugging Face token:</p>
-            <ol>
-                <li>Go to <a href="https://huggingface.co" target="_blank">huggingface.co</a></li>
-                <li>Sign up for free account</li>
-                <li>Go to Settings → Access Tokens</li>
-                <li>Create new token (select "Read" role)</li>
-                <li>Copy and paste below</li>
-            </ol>
-            
-            <label>Hugging Face Token (FREE - Required):</label>
-            <input type="password" class="api-key-input" id="hfToken" 
-                   placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx">
-            
-            <button class="btn" onclick="saveApiKey()">
-                <i class="material-icons">save</i> Save API Key
-            </button>
-        </div>
-        
-        <div class="app-container">
-            <!-- Left Panel -->
-            <div class="left-panel">
-                <div class="panel">
-                    <h2 class="panel-title">
-                        <i class="material-icons">cloud_upload</i>
-                        Upload Product Image
-                    </h2>
-                    <div class="upload-area" id="uploadArea">
-                        <i class="material-icons">photo_camera</i>
-                        <p>Click to upload your product image</p>
-                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                        <button class="btn" onclick="document.getElementById('fileInput').click()">
-                            <i class="material-icons">folder_open</i> Select Image
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div id="root" class="min-h-screen p-4"></div>
+
+  <script>
+    // App Component
+    const App = () => {
+      // State variables
+      const [darkMode, setDarkMode] = React.useState(false);
+      const [selectedRatio, setSelectedRatio] = React.useState('16:9');
+      const [isDragging, setIsDragging] = React.useState(false);
+      const [posters, setPosters] = React.useState([]);
+      
+      // Toggle dark mode
+      const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+        document.documentElement.classList.toggle('dark', !darkMode);
+      };
+      
+      // Handle file drop
+      const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          alert(`Uploaded ${files.length} file(s)`);
+          // Here you would handle the actual file upload
+        }
+      };
+      
+      // Handle drag events
+      const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+      };
+      
+      const handleDragLeave = () => {
+        setIsDragging(false);
+      };
+      
+      // Generate a new poster
+      const generatePoster = () => {
+        const newPoster = {
+          id: Date.now(),
+          name: `Poster ${posters.length + 1}`,
+        };
+        setPosters([...posters, newPoster]);
+      };
+      
+      // Delete a poster
+      const deletePoster = (id) => {
+        setPosters(posters.filter(poster => poster.id !== id));
+      };
+      
+      // Aspect ratio options
+      const ratios = ['9:16', '1:1', '16:9', '3:4', '4:3'];
+      
+      return (
+        <div className="min-h-screen">
+          {/* Header */}
+          <header className="max-w-6xl mx-auto mb-8">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold">
+                  <i className="fas fa-film mr-2 text-primary"></i>
+                  Cinematic Poster Generator
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Transform products into premium cinematic posters with AI
+                </p>
+              </div>
+              <button 
+                onClick={toggleDarkMode}
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700"
+              >
+                {darkMode ? (
+                  <i className="fas fa-sun text-yellow-400"></i>
+                ) : (
+                  <i className="fas fa-moon text-gray-700"></i>
+                )}
+              </button>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Upload Section */}
+            <section className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg lg:col-span-1">
+              <h2 className="text-xl font-semibold mb-4">
+                <i className="fas fa-upload mr-2"></i>
+                1. Product Image
+              </h2>
+              <div 
+                className={`drop-zone border-2 border-dashed rounded-lg p-8 text-center mb-4 ${
+                  isDragging ? 'drag-over border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600'
+                }`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+              >
+                <div className="flex flex-col items-center">
+                  <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-4"></i>
+                  <p className="mb-2">Drag & drop product images</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    JPG, PNG, WEBP (max 5MB)
+                  </p>
+                  <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition">
+                    <i className="fas fa-folder-open mr-2"></i>
+                    Browse Files
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                <i className="fas fa-info-circle mr-1"></i>
+                AI will preserve original lighting, texture, and color fidelity
+              </p>
+            </section>
+
+            {/* Configuration Section */}
+            <section className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg lg:col-span-2">
+              <h2 className="text-xl font-semibold mb-4">
+                <i className="fas fa-sliders-h mr-2"></i>
+                2. Poster Configuration
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Aspect Ratio */}
+                <div>
+                  <h3 className="font-medium mb-2">
+                    <i className="fas fa-crop-alt mr-2"></i>
+                    Aspect Ratio
+                  </h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {ratios.map((ratio) => (
+                      <button 
+                        key={ratio}
+                        onClick={() => setSelectedRatio(ratio)}
+                        className={`py-2 px-3 rounded-lg border ${
+                          ratio === selectedRatio 
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' 
+                            : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {ratio}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Creative Concept */}
+                <div>
+                  <h3 className="font-medium mb-2">
+                    <i className="fas fa-lightbulb mr-2"></i>
+                    Creative Concept
+                  </h3>
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg h-40 overflow-y-auto">
+                    <p className="text-sm">
+                      "Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
+                      Rain reflects its luminous interface, symbolizing human resilience against chaos. 
+                      The scene evokes a cyberpunk thriller where time is power—each second counts."
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customization Options */}
+              <div className="mt-6 space-y-4">
+                <div>
+                  <h3 className="font-medium mb-2">
+                    <i className="fas fa-edit mr-2"></i>
+                    Custom Concept
+                  </h3>
+                  <textarea 
+                    className="w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3"
+                    rows="3"
+                    placeholder="Describe your cinematic vision..."
+                  ></textarea>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-2">
+                    <i className="fas fa-image mr-2"></i>
+                    Reference Image (Optional)
+                  </h3>
+                  <div className="flex items-center">
+                    <button className="mr-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+                      <i className="fas fa-upload mr-2"></i>
+                      Upload Reference
+                    </button>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">JPG, PNG, WEBP</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 mt-6">
+                <button 
+                  onClick={generatePoster}
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-3 rounded-lg font-medium transition flex items-center justify-center"
+                >
+                  <i className="fas fa-bolt mr-2"></i>
+                  Generate Poster
+                </button>
+                
+                <button className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                  <i className="fas fa-history"></i>
+                </button>
+              </div>
+            </section>
+
+            {/* Generated Posters */}
+            <section className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg lg:col-span-3">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">
+                  <i className="fas fa-images mr-2"></i>
+                  Generated Posters
+                </h2>
+                <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                  <i className="fas fa-history mr-1"></i>
+                  View History (12)
+                </button>
+              </div>
+              
+              {posters.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <i className="fas fa-image fa-3x mb-4"></i>
+                  <p>No posters generated yet</p>
+                  <p className="text-sm mt-2">Click "Generate Poster" to create your first cinematic poster</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {posters.map((poster) => (
+                    <div key={poster.id} className="relative group">
+                      <div className="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-full h-48 poster-thumbnail"></div>
+                      <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition">
+                        <button className="bg-white dark:bg-gray-800 p-1.5 rounded-full shadow">
+                          <i className="fas fa-download text-gray-700 dark:text-gray-300"></i>
                         </button>
+                        <button 
+                          onClick={() => deletePoster(poster.id)}
+                          className="bg-white dark:bg-gray-800 p-1.5 rounded-full shadow"
+                        >
+                          <i className="fas fa-trash text-red-500"></i>
+                        </button>
+                      </div>
+                      <div className="mt-2 text-center">
+                        <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                          <i className="fas fa-edit mr-1"></i>
+                          Refine Poster
+                        </button>
+                      </div>
                     </div>
-                    <div id="imagePreview"></div>
+                  ))}
                 </div>
-                
-                <div class="panel">
-                    <h2 class="panel-title">
-                        <i class="material-icons">lightbulb</i>
-                        Creative Concept
-                    </h2>
-                    <textarea id="conceptBox" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" 
-                              placeholder="Describe your poster concept or let AI generate ideas..."></textarea>
-                    <button class="btn" id="generateConceptBtn" style="margin-top: 10px;">
-                        <i class="material-icons">auto_awesome</i> Generate AI Ideas
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Right Panel -->
-            <div class="right-panel">
-                <div class="panel">
-                    <h2 class="panel-title">
-                        <i class="material-icons">collections</i>
-                        Generate Poster
-                    </h2>
-                    <button class="btn" id="generatePosterBtn" disabled>
-                        <i class="material-icons">add_photo_alternate</i> Generate AI Poster
-                    </button>
-                    
-                    <div class="generated-area" id="generatedArea">
-                        <div style="text-align: center; padding: 40px; color: #666;">
-                            <i class="material-icons" style="font-size: 48px; opacity: 0.5;">photo_library</i>
-                            <p>Your generated posters will appear here</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+              )}
+            </section>
+          </main>
+
+          {/* Footer */}
+          <footer className="max-w-6xl mx-auto mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
+            <p>
+              <i className="fas fa-robot mr-1"></i>
+              Powered by Gemini 2.5 Pro + 🍌Nano Banana AI | 
+              Preserving product authenticity in every cinematic scene
+            </p>
+          </footer>
         </div>
-    </div>
+      );
+    };
 
-    <script>
-        // Configuration
-        const HF_TOKEN = '';
-        let uploadedImage = null;
-
-        // DOM Elements
-        const fileInput = document.getElementById('fileInput');
-        const generatePosterBtn = document.getElementById('generatePosterBtn');
-        const generateConceptBtn = document.getElementById('generateConceptBtn');
-        const generatedArea = document.getElementById('generatedArea');
-        const conceptBox = document.getElementById('conceptBox');
-
-        // Save API Key
-        function saveApiKey() {
-            const token = document.getElementById('hfToken').value;
-            if (!token.startsWith('hf_')) {
-                showNotification('Please enter a valid Hugging Face token', true);
-                return;
-            }
-            
-            localStorage.setItem('hfToken', token);
-            showNotification('API key saved successfully!');
-            checkReadyState();
-        }
-
-        // Load saved API key
-        function loadApiKey() {
-            const savedToken = localStorage.getItem('hfToken');
-            if (savedToken) {
-                document.getElementById('hfToken').value = savedToken;
-            }
-        }
-
-        // Check if ready to generate
-        function checkReadyState() {
-            const hasToken = localStorage.getItem('hfToken');
-            const hasImage = uploadedImage !== null;
-            
-            generatePosterBtn.disabled = !(hasToken && hasImage);
-            
-            if (hasToken && hasImage) {
-                generatePosterBtn.innerHTML = '<i class="material-icons">add_photo_alternate</i> Generate AI Poster';
-            }
-        }
-
-        // Show notification
-        function showNotification(message, isError = false) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${isError ? 'error' : ''}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Handle image upload
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                uploadedImage = file;
-                
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').innerHTML = `
-                        <div style="text-align: center; margin-top: 20px;">
-                            <img src="${e.target.result}" style="max-width: 200px; border-radius: 5px;">
-                            <p>Image ready for processing</p>
-                        </div>
-                    `;
-                };
-                reader.readAsDataURL(file);
-                
-                checkReadyState();
-                showNotification('Image uploaded successfully!');
-            }
-        });
-
-        // Generate poster using Hugging Face
-        async function generatePoster() {
-            if (!uploadedImage) {
-                showNotification('Please upload an image first', true);
-                return;
-            }
-
-            const token = localStorage.getItem('hfToken');
-            if (!token) {
-                showNotification('Please save your Hugging Face token first', true);
-                return;
-            }
-
-            generatePosterBtn.innerHTML = '<div class="loading"></div> Generating...';
-            generatePosterBtn.disabled = true;
-
-            try {
-                // Simulate AI processing (replace with actual API call)
-                const posterUrl = await simulateAIPosterGeneration(uploadedImage, conceptBox.value);
-                
-                // Add to generated area
-                addPosterToGallery(posterUrl);
-                showNotification('Poster generated successfully!');
-                
-            } catch (error) {
-                showNotification('Generation failed: ' + error.message, true);
-            }
-
-            generatePosterBtn.innerHTML = '<i class="material-icons">add_photo_alternate</i> Generate AI Poster';
-            generatePosterBtn.disabled = false;
-        }
-
-        // Simulate AI poster generation (replace with actual API)
-        function simulateAIPosterGeneration(imageFile, concept) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // Create a simple canvas-based "poster"
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 400;
-                    canvas.height = 600;
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Draw background
-                    ctx.fillStyle = '#2c3e50';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Draw product image
-                    const img = new Image();
-                    img.onload = function() {
-                        ctx.drawImage(img, 50, 150, 300, 300);
-                        
-                        // Add text
-                        ctx.fillStyle = 'white';
-                        ctx.font = 'bold 24px Arial';
-                        ctx.fillText('AI Generated Poster', 50, 100);
-                        
-                        ctx.font = '16px Arial';
-                        ctx.fillText(concept || 'Cinematic Design', 50, 500);
-                        
-                        resolve(canvas.toDataURL());
-                    };
-                    
-                    img.src = URL.createObjectURL(imageFile);
-                }, 2000);
-            });
-        }
-
-        // Add poster to gallery
-        function addPosterToGallery(imageUrl) {
-            const posterElement = document.createElement('div');
-            posterElement.className = 'poster-thumbnail';
-            posterElement.innerHTML = `
-                <img src="${imageUrl}" alt="Generated Poster">
-                <div class="poster-actions">
-                    <button class="action-btn" onclick="viewFullscreen('${imageUrl}')">
-                        <i class="material-icons">fullscreen</i>
-                    </button>
-                    <button class="action-btn" onclick="downloadImage('${imageUrl}')">
-                        <i class="material-icons">download</i>
-                    </button>
-                </div>
-            `;
-            
-            generatedArea.innerHTML = '';
-            generatedArea.appendChild(posterElement);
-        }
-
-        // View in fullscreen
-        function viewFullscreen(imageUrl) {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                background: rgba(0,0,0,0.9); z-index: 1000; display: flex; 
-                justify-content: center; align-items: center;
-            `;
-            modal.innerHTML = `
-                <img src="${imageUrl}" style="max-width: 90%; max-height: 90%;">
-                <button onclick="this.parentElement.remove()" style="position: absolute; top: 20px; right: 30px; background: none; border: none; color: white; font-size: 30px; cursor: pointer;">×</button>
-            `;
-            document.body.appendChild
+    // Render the app
+    const rootElement = document.getElementById('root');
+    ReactDOM.render(<App />, rootElement);
+  </script>
+  
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</body>
+</html>
