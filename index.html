@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cinematic Poster Generator</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="./css/styles.css"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body>
   <div class="dark-mode-toggle" id="darkModeToggle">
     <i class="fas fa-moon"></i>
   </div>
 
-  <div class="notification" id="notification">
-    Poster generated successfully!
-  </div>
+  <div class="notification" id="notification">Poster generated successfully!</div>
 
   <div class="modal" id="previewModal">
     <div class="modal-content">
@@ -28,7 +26,6 @@
       <h1><i class="fas fa-film"></i> Cinematic Poster Generator</h1>
       <p class="subtitle">Transform products into premium cinematic posters with AI</p>
 
-      <!-- Small control bar for refinement toggle -->
       <div style="display:flex; gap:10px; justify-content:center; align-items:center; margin-top:12px; flex-wrap:wrap;">
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
           <input type="checkbox" id="refineToggle"/>
@@ -37,7 +34,7 @@
         <select id="resolutionSelect" style="padding:10px; border-radius:8px; border:1px solid #e5e7eb;">
           <option value="auto">Auto by ratio</option>
           <option value="1024">1024 px long side</option>
-          <option value="1365">1365 px long side</option>
+          <option value="1365" selected>1365 px long side</option>
           <option value="1536">1536 px long side</option>
         </select>
       </div>
@@ -47,15 +44,13 @@
       <div class="card">
         <h2><i class="fas fa-upload"></i> 1. Product Image</h2>
         <div class="upload-area" id="uploadArea">
-          <div class="upload-icon">
-            <i class="fas fa-cloud-upload-alt"></i>
-          </div>
+          <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
           <p>Drag & drop product images</p>
           <p class="subtitle">JPG, PNG, WEBP (max 5MB)</p>
           <button class="btn" id="browseBtn" style="margin-top: 15px;">
             <i class="fas fa-folder-open"></i> Browse Files
           </button>
-          <input type="file" id="fileInput" accept="image/*" style="display: none;">
+          <input type="file" id="fileInput" accept="image/*" style="display:none;">
           <img id="imagePreview" class="image-preview" alt="Preview">
         </div>
         <p class="subtitle"><i class="fas fa-info-circle"></i> AI will preserve original lighting, texture, and color fidelity</p>
@@ -75,19 +70,17 @@
 
         <h3><i class="fas fa-lightbulb"></i> Creative Concept</h3>
         <div class="concept-box" id="conceptBox">
-          "Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
-          Rain reflects its luminous interface, symbolizing human resilience against chaos. 
-          The scene evokes a cyberpunk thriller where time is power—each second counts."
+"Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
+Rain reflects its luminous interface, symbolizing human resilience against chaos. 
+The scene evokes a cyberpunk thriller where time is power—each second counts."
         </div>
 
         <h3><i class="fas fa-edit"></i> Custom Concept</h3>
         <textarea id="customConcept" placeholder="Describe your cinematic vision..."></textarea>
 
         <h3><i class="fas fa-image"></i> Reference Image (Optional)</h3>
-        <button class="btn" id="refImageBtn">
-          <i class="fas fa-upload"></i> Upload Reference
-        </button>
-        <input type="file" id="refImageInput" accept="image/*" style="display: none;">
+        <button class="btn" id="refImageBtn"><i class="fas fa-upload"></i> Upload Reference</button>
+        <input type="file" id="refImageInput" accept="image/*" style="display:none;">
 
         <div class="action-row" style="margin-top: 25px;">
           <button class="btn generate-btn" id="generateBtn">
@@ -101,13 +94,10 @@
     </div>
 
     <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin-bottom: 0;"><i class="fas fa-images"></i> Generated Posters</h2>
-        <button class="btn" id="viewHistoryBtn">
-          <i class="fas fa-history"></i> View History
-        </button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin-bottom:0;"><i class="fas fa-images"></i> Generated Posters</h2>
+        <button class="btn" id="viewHistoryBtn"><i class="fas fa-history"></i> View History</button>
       </div>
-
       <div class="posters-grid" id="postersGrid"></div>
     </div>
 
@@ -116,6 +106,6 @@
     </footer>
   </div>
 
-  <script src="./js/app.js" type="module"></script>
+  <script src="/js/app.js" type="module"></script>
 </body>
 </html>
