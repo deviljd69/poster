@@ -96,7 +96,7 @@
         // Remove Background using ClipDrop API
         async function removeBackground(imageFile) {
             if (!API_CONFIG.clipdrop.apiKey) {
-                throw new Error('');
+                throw new Error('Please enter your ClipDrop API key');
             }
 
             const formData = new FormData();
@@ -126,7 +126,7 @@
         // Remove Background using Remove.bg API
         async function removeBackgroundRemoveBG(imageFile) {
             if (!API_CONFIG.removebg.apiKey) {
-                throw new Error('');
+                throw new Error('Please enter your Remove.bg API key');
             }
 
             const formData = new FormData();
