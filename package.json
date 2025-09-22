@@ -1,0 +1,11 @@
+{
+  "name": "cinematic-poster-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev",
+    "build": "echo \"Static + serverless — no local build step\""
+  }
+}
