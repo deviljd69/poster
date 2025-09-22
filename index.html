@@ -18,13 +18,19 @@
             --border-dark: #374151;
         }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-light);
             color: var(--text-light);
-            margin: 0;
             padding: 20px;
             transition: all 0.3s ease;
+            min-height: 100vh;
         }
 
         body.dark {
@@ -96,6 +102,12 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 20px;
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .dark .upload-area {
@@ -133,6 +145,12 @@
 
         .btn:hover {
             background-color: #4338ca;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
         }
 
         .ratio-grid {
@@ -243,6 +261,8 @@
             justify-content: center;
             color: white;
             font-size: 3rem;
+            background-size: cover;
+            background-position: center;
         }
 
         .poster-actions {
@@ -319,6 +339,68 @@
             color: #9ca3af;
         }
 
+        .image-preview {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-light);
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+
+        .dark .modal-content {
+            background: var(--card-dark);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .full-preview {
+            max-width: 100%;
+            max-height: 80vh;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -333,6 +415,17 @@
 <body>
     <div class="dark-mode-toggle" id="darkModeToggle">
         <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="notification" id="notification">
+        Poster generated successfully!
+    </div>
+
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <img id="fullPreview" class="full-preview" src="" alt="Full size preview">
+        </div>
     </div>
 
     <div class="container">
@@ -350,9 +443,11 @@
                     </div>
                     <p>Drag & drop product images</p>
                     <p class="subtitle">JPG, PNG, WEBP (max 5MB)</p>
-                    <button class="btn" style="margin-top: 15px;">
+                    <button class="btn" id="browseBtn" style="margin-top: 15px;">
                         <i class="fas fa-folder-open"></i> Browse Files
                     </button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <img id="imagePreview" class="image-preview" alt="Preview">
                 </div>
                 <p class="subtitle"><i class="fas fa-info-circle"></i> AI will preserve original lighting, texture, and color fidelity</p>
             </div>
@@ -361,34 +456,35 @@
                 <h2><i class="fas fa-sliders-h"></i> 2. Poster Configuration</h2>
                 
                 <h3><i class="fas fa-crop-alt"></i> Aspect Ratio</h3>
-                <div class="ratio-grid">
-                    <div class="ratio-btn active">9:16</div>
-                    <div class="ratio-btn">1:1</div>
-                    <div class="ratio-btn">16:9</div>
-                    <div class="ratio-btn">3:4</div>
-                    <div class="ratio-btn">4:3</div>
+                <div class="ratio-grid" id="ratioGrid">
+                    <div class="ratio-btn active" data-ratio="9:16">9:16</div>
+                    <div class="ratio-btn" data-ratio="1:1">1:1</div>
+                    <div class="ratio-btn" data-ratio="16:9">16:9</div>
+                    <div class="ratio-btn" data-ratio="3:4">3:4</div>
+                    <div class="ratio-btn" data-ratio="4:3">4:3</div>
                 </div>
 
                 <h3><i class="fas fa-lightbulb"></i> Creative Concept</h3>
-                <div class="concept-box">
+                <div class="concept-box" id="conceptBox">
                     "Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
                     Rain reflects its luminous interface, symbolizing human resilience against chaos. 
                     The scene evokes a cyberpunk thriller where time is power—each second counts."
                 </div>
 
                 <h3><i class="fas fa-edit"></i> Custom Concept</h3>
-                <textarea placeholder="Describe your cinematic vision..."></textarea>
+                <textarea id="customConcept" placeholder="Describe your cinematic vision..."></textarea>
 
                 <h3><i class="fas fa-image"></i> Reference Image (Optional)</h3>
-                <button class="btn">
+                <button class="btn" id="refImageBtn">
                     <i class="fas fa-upload"></i> Upload Reference
                 </button>
+                <input type="file" id="refImageInput" accept="image/*" style="display: none;">
                 
                 <div class="action-row" style="margin-top: 25px;">
-                    <button class="btn generate-btn">
+                    <button class="btn generate-btn" id="generateBtn">
                         <i class="fas fa-bolt"></i> Generate Poster
                     </button>
-                    <button class="btn history-btn">
+                    <button class="btn history-btn" id="historyBtn">
                         <i class="fas fa-history"></i>
                     </button>
                 </div>
@@ -398,79 +494,13 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="margin-bottom: 0;"><i class="fas fa-images"></i> Generated Posters</h2>
-                <a href="#" class="btn" style="text-decoration: none;">
+                <button class="btn" id="viewHistoryBtn">
                     <i class="fas fa-history"></i> View History
-                </a>
+                </button>
             </div>
             
-            <div class="posters-grid">
-                <div class="poster-item">
-                    <div class="poster-thumb">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <div class="poster-actions">
-                        <div class="action-btn">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="action-btn">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                    </div>
-                    <a href="#" class="refine-btn">
-                        <i class="fas fa-edit"></i> Refine Poster
-                    </a>
-                </div>
-                
-                <div class="poster-item">
-                    <div class="poster-thumb">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <div class="poster-actions">
-                        <div class="action-btn">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="action-btn">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                    </div>
-                    <a href="#" class="refine-btn">
-                        <i class="fas fa-edit"></i> Refine Poster
-                    </a>
-                </div>
-                
-                <div class="poster-item">
-                    <div class="poster-thumb">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <div class="poster-actions">
-                        <div class="action-btn">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="action-btn">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                    </div>
-                    <a href="#" class="refine-btn">
-                        <i class="fas fa-edit"></i> Refine Poster
-                    </a>
-                </div>
-                
-                <div class="poster-item">
-                    <div class="poster-thumb">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <div class="poster-actions">
-                        <div class="action-btn">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="action-btn">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                    </div>
-                    <a href="#" class="refine-btn">
-                        <i class="fas fa-edit"></i> Refine Poster
-                    </a>
-                </div>
+            <div class="posters-grid" id="postersGrid">
+                <!-- Posters will be added here dynamically -->
             </div>
         </div>
         
@@ -480,10 +510,38 @@
     </div>
 
     <script>
-        // Toggle dark mode
+        // DOM Elements
         const darkModeToggle = document.getElementById('darkModeToggle');
         const body = document.body;
-        
+        const ratioButtons = document.querySelectorAll('.ratio-btn');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const imagePreview = document.getElementById('imagePreview');
+        const generateBtn = document.getElementById('generateBtn');
+        const postersGrid = document.getElementById('postersGrid');
+        const refImageBtn = document.getElementById('refImageBtn');
+        const refImageInput = document.getElementById('refImageInput');
+        const previewModal = document.getElementById('previewModal');
+        const closeModal = document.getElementById('closeModal');
+        const fullPreview = document.getElementById('fullPreview');
+        const notification = document.getElementById('notification');
+        const viewHistoryBtn = document.getElementById('viewHistoryBtn');
+        const customConcept = document.getElementById('customConcept');
+        const conceptBox = document.getElementById('conceptBox');
+
+        // State
+        let uploadedImage = null;
+        let posters = [];
+        let selectedRatio = '9:16';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial concept
+            updateConcept();
+        });
+
+        // Toggle dark mode
         darkModeToggle.addEventListener('click', () => {
             body.classList.toggle('dark');
             const icon = darkModeToggle.querySelector('i');
@@ -498,16 +556,24 @@
         });
 
         // Ratio selection
-        const ratioButtons = document.querySelectorAll('.ratio-btn');
         ratioButtons.forEach(button => {
             button.addEventListener('click', () => {
                 ratioButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
+                selectedRatio = button.dataset.ratio;
+                showNotification(`Aspect ratio set to ${selectedRatio}`);
             });
         });
 
-        // Upload area hover effect
-        const uploadArea = document.getElementById('uploadArea');
+        // File upload handling
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFileUpload(e.target.files[0]);
+        });
+
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.style.borderColor = '#4f46e5';
@@ -523,8 +589,168 @@
             e.preventDefault();
             uploadArea.style.borderColor = '';
             uploadArea.style.backgroundColor = '';
-            alert('File uploaded successfully!');
+            
+            if (e.dataTransfer.files.length) {
+                handleFileUpload(e.dataTransfer.files[0]);
+            }
         });
+
+        function handleFileUpload(file) {
+            if (!file.type.match('image.*')) {
+                showNotification('Please upload an image file (JPG, PNG, WEBP)');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('File size exceeds 5MB limit');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage = e.target.result;
+                imagePreview.src = uploadedImage;
+                imagePreview.style.display = 'block';
+                showNotification('Product image uploaded successfully!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Reference image upload
+        refImageBtn.addEventListener('click', () => {
+            refImageInput.click();
+        });
+
+        refImageInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                showNotification('Reference image uploaded');
+            }
+        });
+
+        // Generate poster
+        generateBtn.addEventListener('click', () => {
+            if (!uploadedImage) {
+                showNotification('Please upload a product image first');
+                return;
+            }
+            
+            // Create poster object
+            const poster = {
+                id: Date.now(),
+                image: uploadedImage,
+                concept: customConcept.value || conceptBox.textContent,
+                ratio: selectedRatio,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            posters.push(poster);
+            renderPosters();
+            showNotification('Cinematic poster generated!');
+        });
+
+        // Render posters
+        function renderPosters() {
+            postersGrid.innerHTML = '';
+            
+            posters.forEach(poster => {
+                const posterElement = document.createElement('div');
+                posterElement.className = 'poster-item';
+                posterElement.innerHTML = `
+                    <div class="poster-thumb" style="background-image: url('${poster.image}')">
+                        <i class="fas fa-camera" style="display: none;"></i>
+                    </div>
+                    <div class="poster-actions">
+                        <div class="action-btn download-btn" data-id="${poster.id}">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="action-btn delete-btn" data-id="${poster.id}">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </div>
+                    <button class="refine-btn" data-id="${poster.id}">
+                        <i class="fas fa-edit"></i> Refine Poster
+                    </button>
+                `;
+                postersGrid.appendChild(posterElement);
+                
+                // Add event listeners for new elements
+                const thumb = posterElement.querySelector('.poster-thumb');
+                const downloadBtn = posterElement.querySelector('.download-btn');
+                const deleteBtn = posterElement.querySelector('.delete-btn');
+                const refineBtn = posterElement.querySelector('.refine-btn');
+                
+                thumb.addEventListener('click', () => {
+                    fullPreview.src = poster.image;
+                    previewModal.style.display = 'flex';
+                });
+                
+                downloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadImage(poster.image, `poster-${poster.id}.png`);
+                });
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    posters = posters.filter(p => p.id !== poster.id);
+                    renderPosters();
+                    showNotification('Poster deleted');
+                });
+                
+                refineBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showNotification('Refine feature activated for this poster');
+                });
+            });
+        }
+
+        // Download image
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('Poster downloaded!');
+        }
+
+        // Modal controls
+        closeModal.addEventListener('click', () => {
+            previewModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === previewModal) {
+                previewModal.style.display = 'none';
+            }
+        });
+
+        // View history
+        viewHistoryBtn.addEventListener('click', () => {
+            showNotification(`Viewing ${posters.length} generated posters`);
+        });
+
+        // Update concept based on custom input
+        customConcept.addEventListener('input', updateConcept);
+
+        function updateConcept() {
+            if (customConcept.value) {
+                conceptBox.textContent = customConcept.value;
+            } else {
+                conceptBox.innerHTML = `"Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
+                Rain reflects its luminous interface, symbolizing human resilience against chaos. 
+                The scene evokes a cyberpunk thriller where time is power—each second counts."`;
+            }
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
     </script>
 </body>
 </html>
