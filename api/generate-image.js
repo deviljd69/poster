@@ -1,7 +1,5 @@
-// api/generate-image.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
   try {
     const { prompt, width = 1024, height = 1024 } = req.body || {};
     if (!prompt) return res.status(400).json({ error: 'Missing prompt' });

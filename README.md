@@ -1,14 +1,21 @@
-# Cinematic Poster Generator (Gemini + ImageFX)
+# Cinematic Poster Generator (Vercel + Google AI Studio)
 
-Generate cinematic product posters using Google AI Studio securely via serverless functions (keeps your API key off the client).
+Static frontend + Vercel Serverless Functions for secure Google AI calls.
 
-- Image generation: Google ImageFX (images:generate)
-- Optional prompt refinement: Gemini (text) before image generation
-- Frontend: static HTML/CSS/JS
-- Backend: Vercel Serverless Functions in /api
+## Files
+- index.html
+- css/styles.css
+- js/app.js
+- api/generate-image.js
+- api/refine-prompt.js
 
-## Prerequisites
-- Node.js 18+
-- Google AI Studio API key
+## Environment Variables (Vercel)
+- In Vercel → Project → Settings → Environment Variables:
+  - Name: GOOGLE_API_KEY
+  - Value: YOUR_GOOGLE_AI_STUDIO_API_KEY
+  - Environments: Production (and Preview if needed)
+- Do not commit a `.env` for production.
 
-## Repo Structure (Vercel-friendly)
+## Local Dev (optional)
+- Install Vercel CLI: `npm i -g vercel`
+- Create `.env.local` (not committed):
