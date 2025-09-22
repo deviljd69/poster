@@ -1,756 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinematic Poster Generator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-light: #f9fafb;
-            --text-light: #1f2937;
-            --card-light: #ffffff;
-            --border-light: #e5e7eb;
-            --primary: #4f46e5;
-            --bg-dark: #111827;
-            --text-dark: #f3f4f6;
-            --card-dark: #1f2937;
-            --border-dark: #374151;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-light);
-            padding: 20px;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-        }
-
-        body.dark {
-            background-color: var(--bg-dark);
-            color: var(--text-dark);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin: 0;
-            color: var(--primary);
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            color: #6b7280;
-            margin-top: 5px;
-        }
-
-        .dark .subtitle {
-            color: #9ca3af;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background-color: var(--card-light);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-light);
-        }
-
-        .dark .card {
-            background-color: var(--card-dark);
-            border-color: var(--border-dark);
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .upload-area {
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-            position: relative;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .dark .upload-area {
-            border-color: #4b5563;
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary);
-            background-color: rgba(79, 70, 229, 0.05);
-        }
-
-        .dark .upload-area:hover {
-            background-color: rgba(79, 70, 229, 0.1);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            color: #9ca3af;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: background-color 0.2s;
-        }
-
-        .btn:hover {
-            background-color: #4338ca;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .ratio-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .ratio-btn {
-            padding: 10px;
-            border: 1px solid var(--border-light);
-            border-radius: 6px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .dark .ratio-btn {
-            border-color: var(--border-dark);
-        }
-
-        .ratio-btn:hover, .ratio-btn.active {
-            border-color: var(--primary);
-            background-color: rgba(79, 70, 229, 0.1);
-            color: var(--primary);
-        }
-
-        .concept-box {
-            background-color: #f3f4f6;
-            border-radius: 8px;
-            padding: 15px;
-            height: 150px;
-            overflow-y: auto;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .dark .concept-box {
-            background-color: #1e293b;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
-            background-color: var(--card-light);
-            color: var(--text-light);
-            font-family: inherit;
-            margin-bottom: 20px;
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .dark textarea {
-            border-color: var(--border-dark);
-            background-color: var(--card-dark);
-            color: var(--text-dark);
-        }
-
-        .action-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .generate-btn {
-            flex: 1;
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            padding: 15px;
-            font-size: 1.1rem;
-        }
-
-        .history-btn {
-            background: none;
-            border: 1px solid var(--border-light);
-            color: var(--text-light);
-            width: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .dark .history-btn {
-            border-color: var(--border-dark);
-            color: var(--text-dark);
-        }
-
-        .posters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .poster-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .poster-thumb {
-            background: linear-gradient(45deg, #6b7280, #9ca3af);
-            height: 200px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .poster-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 5px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .poster-item:hover .poster-actions {
-            opacity: 1;
-        }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .dark .action-btn {
-            background: rgba(31, 41, 55, 0.9);
-        }
-
-        .refine-btn {
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .dark-mode-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--card-light);
-            border: 1px solid var(--border-light);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            z-index: 100;
-        }
-
-        .dark .dark-mode-toggle {
-            background: var(--card-dark);
-            border-color: var(--border-dark);
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            color: #6b7280;
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-light);
-            margin-top: 40px;
-        }
-
-        .dark footer {
-            border-color: var(--border-dark);
-            color: #9ca3af;
-        }
-
-        .image-preview {
-            max-width: 100%;
-            max-height: 150px;
-            margin-top: 15px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: var(--card-light);
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto;
-            position: relative;
-        }
-
-        .dark .modal-content {
-            background: var(--card-dark);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .full-preview {
-            max-width: 100%;
-            max-height: 80vh;
-        }
-
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 1000;
-        }
-
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .ratio-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cinematic Poster Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="./css/styles.css"/>
 </head>
 <body>
-    <div class="dark-mode-toggle" id="darkModeToggle">
-        <i class="fas fa-moon"></i>
-    </div>
+  <div class="dark-mode-toggle" id="darkModeToggle">
+    <i class="fas fa-moon"></i>
+  </div>
 
-    <div class="notification" id="notification">
-        Poster generated successfully!
-    </div>
+  <div class="notification" id="notification">
+    Poster generated successfully!
+  </div>
 
-    <div class="modal" id="previewModal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            <img id="fullPreview" class="full-preview" src="" alt="Full size preview">
+  <div class="modal" id="previewModal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal">&times;</span>
+      <img id="fullPreview" class="full-preview" src="" alt="Full size preview">
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-film"></i> Cinematic Poster Generator</h1>
+      <p class="subtitle">Transform products into premium cinematic posters with AI</p>
+
+      <!-- Small control bar for refinement toggle -->
+      <div style="display:flex; gap:10px; justify-content:center; align-items:center; margin-top:12px; flex-wrap:wrap;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="refineToggle"/>
+          <span>Refine prompt with Gemini before generating</span>
+        </label>
+        <select id="resolutionSelect" style="padding:10px; border-radius:8px; border:1px solid #e5e7eb;">
+          <option value="auto">Auto by ratio</option>
+          <option value="1024">1024 px long side</option>
+          <option value="1365">1365 px long side</option>
+          <option value="1536">1536 px long side</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2><i class="fas fa-upload"></i> 1. Product Image</h2>
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <p>Drag & drop product images</p>
+          <p class="subtitle">JPG, PNG, WEBP (max 5MB)</p>
+          <button class="btn" id="browseBtn" style="margin-top: 15px;">
+            <i class="fas fa-folder-open"></i> Browse Files
+          </button>
+          <input type="file" id="fileInput" accept="image/*" style="display: none;">
+          <img id="imagePreview" class="image-preview" alt="Preview">
         </div>
-    </div>
+        <p class="subtitle"><i class="fas fa-info-circle"></i> AI will preserve original lighting, texture, and color fidelity</p>
+      </div>
 
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-film"></i> Cinematic Poster Generator</h1>
-            <p class="subtitle">Transform products into premium cinematic posters with AI</p>
-        </header>
+      <div class="card">
+        <h2><i class="fas fa-sliders-h"></i> 2. Poster Configuration</h2>
 
-        <div class="grid">
-            <div class="card">
-                <h2><i class="fas fa-upload"></i> 1. Product Image</h2>
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <p>Drag & drop product images</p>
-                    <p class="subtitle">JPG, PNG, WEBP (max 5MB)</p>
-                    <button class="btn" id="browseBtn" style="margin-top: 15px;">
-                        <i class="fas fa-folder-open"></i> Browse Files
-                    </button>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                    <img id="imagePreview" class="image-preview" alt="Preview">
-                </div>
-                <p class="subtitle"><i class="fas fa-info-circle"></i> AI will preserve original lighting, texture, and color fidelity</p>
-            </div>
-
-            <div class="card">
-                <h2><i class="fas fa-sliders-h"></i> 2. Poster Configuration</h2>
-                
-                <h3><i class="fas fa-crop-alt"></i> Aspect Ratio</h3>
-                <div class="ratio-grid" id="ratioGrid">
-                    <div class="ratio-btn active" data-ratio="9:16">9:16</div>
-                    <div class="ratio-btn" data-ratio="1:1">1:1</div>
-                    <div class="ratio-btn" data-ratio="16:9">16:9</div>
-                    <div class="ratio-btn" data-ratio="3:4">3:4</div>
-                    <div class="ratio-btn" data-ratio="4:3">4:3</div>
-                </div>
-
-                <h3><i class="fas fa-lightbulb"></i> Creative Concept</h3>
-                <div class="concept-box" id="conceptBox">
-                    "Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
-                    Rain reflects its luminous interface, symbolizing human resilience against chaos. 
-                    The scene evokes a cyberpunk thriller where time is power—each second counts."
-                </div>
-
-                <h3><i class="fas fa-edit"></i> Custom Concept</h3>
-                <textarea id="customConcept" placeholder="Describe your cinematic vision..."></textarea>
-
-                <h3><i class="fas fa-image"></i> Reference Image (Optional)</h3>
-                <button class="btn" id="refImageBtn">
-                    <i class="fas fa-upload"></i> Upload Reference
-                </button>
-                <input type="file" id="refImageInput" accept="image/*" style="display: none;">
-                
-                <div class="action-row" style="margin-top: 25px;">
-                    <button class="btn generate-btn" id="generateBtn">
-                        <i class="fas fa-bolt"></i> Generate Poster
-                    </button>
-                    <button class="btn history-btn" id="historyBtn">
-                        <i class="fas fa-history"></i>
-                    </button>
-                </div>
-            </div>
+        <h3><i class="fas fa-crop-alt"></i> Aspect Ratio</h3>
+        <div class="ratio-grid" id="ratioGrid">
+          <div class="ratio-btn active" data-ratio="9:16">9:16</div>
+          <div class="ratio-btn" data-ratio="1:1">1:1</div>
+          <div class="ratio-btn" data-ratio="16:9">16:9</div>
+          <div class="ratio-btn" data-ratio="3:4">3:4</div>
+          <div class="ratio-btn" data-ratio="4:3">4:3</div>
         </div>
 
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin-bottom: 0;"><i class="fas fa-images"></i> Generated Posters</h2>
-                <button class="btn" id="viewHistoryBtn">
-                    <i class="fas fa-history"></i> View History
-                </button>
-            </div>
-            
-            <div class="posters-grid" id="postersGrid">
-                <!-- Posters will be added here dynamically -->
-            </div>
+        <h3><i class="fas fa-lightbulb"></i> Creative Concept</h3>
+        <div class="concept-box" id="conceptBox">
+          "Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
+          Rain reflects its luminous interface, symbolizing human resilience against chaos. 
+          The scene evokes a cyberpunk thriller where time is power—each second counts."
         </div>
-        
-        <footer>
-            <p><i class="fas fa-robot"></i> Powered by Gemini 2.5 Pro + 🍌Nano Banana AI | Preserving product authenticity</p>
-        </footer>
+
+        <h3><i class="fas fa-edit"></i> Custom Concept</h3>
+        <textarea id="customConcept" placeholder="Describe your cinematic vision..."></textarea>
+
+        <h3><i class="fas fa-image"></i> Reference Image (Optional)</h3>
+        <button class="btn" id="refImageBtn">
+          <i class="fas fa-upload"></i> Upload Reference
+        </button>
+        <input type="file" id="refImageInput" accept="image/*" style="display: none;">
+
+        <div class="action-row" style="margin-top: 25px;">
+          <button class="btn generate-btn" id="generateBtn">
+            <i class="fas fa-bolt"></i> Generate Poster
+          </button>
+          <button class="btn history-btn" id="historyBtn">
+            <i class="fas fa-history"></i>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <script>
-        // DOM Elements
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const body = document.body;
-        const ratioButtons = document.querySelectorAll('.ratio-btn');
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const browseBtn = document.getElementById('browseBtn');
-        const imagePreview = document.getElementById('imagePreview');
-        const generateBtn = document.getElementById('generateBtn');
-        const postersGrid = document.getElementById('postersGrid');
-        const refImageBtn = document.getElementById('refImageBtn');
-        const refImageInput = document.getElementById('refImageInput');
-        const previewModal = document.getElementById('previewModal');
-        const closeModal = document.getElementById('closeModal');
-        const fullPreview = document.getElementById('fullPreview');
-        const notification = document.getElementById('notification');
-        const viewHistoryBtn = document.getElementById('viewHistoryBtn');
-        const customConcept = document.getElementById('customConcept');
-        const conceptBox = document.getElementById('conceptBox');
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin-bottom: 0;"><i class="fas fa-images"></i> Generated Posters</h2>
+        <button class="btn" id="viewHistoryBtn">
+          <i class="fas fa-history"></i> View History
+        </button>
+      </div>
 
-        // State
-        let uploadedImage = null;
-        let posters = [];
-        let selectedRatio = '9:16';
+      <div class="posters-grid" id="postersGrid"></div>
+    </div>
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set initial concept
-            updateConcept();
-        });
+    <footer>
+      <p><i class="fas fa-robot"></i> Powered by Gemini + ImageFX | Preserving product authenticity</p>
+    </footer>
+  </div>
 
-        // Toggle dark mode
-        darkModeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            const icon = darkModeToggle.querySelector('i');
-            
-            if (body.classList.contains('dark')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
-        });
-
-        // Ratio selection
-        ratioButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                ratioButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                selectedRatio = button.dataset.ratio;
-                showNotification(`Aspect ratio set to ${selectedRatio}`);
-            });
-        });
-
-        // File upload handling
-        browseBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            handleFileUpload(e.target.files[0]);
-        });
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#4f46e5';
-            uploadArea.style.backgroundColor = 'rgba(79, 70, 229, 0.05)';
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '';
-            uploadArea.style.backgroundColor = '';
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '';
-            uploadArea.style.backgroundColor = '';
-            
-            if (e.dataTransfer.files.length) {
-                handleFileUpload(e.dataTransfer.files[0]);
-            }
-        });
-
-        function handleFileUpload(file) {
-            if (!file.type.match('image.*')) {
-                showNotification('Please upload an image file (JPG, PNG, WEBP)');
-                return;
-            }
-            
-            if (file.size > 5 * 1024 * 1024) {
-                showNotification('File size exceeds 5MB limit');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                uploadedImage = e.target.result;
-                imagePreview.src = uploadedImage;
-                imagePreview.style.display = 'block';
-                showNotification('Product image uploaded successfully!');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Reference image upload
-        refImageBtn.addEventListener('click', () => {
-            refImageInput.click();
-        });
-
-        refImageInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                showNotification('Reference image uploaded');
-            }
-        });
-
-        // Generate poster
-        generateBtn.addEventListener('click', () => {
-            if (!uploadedImage) {
-                showNotification('Please upload a product image first');
-                return;
-            }
-            
-            // Create poster object
-            const poster = {
-                id: Date.now(),
-                image: uploadedImage,
-                concept: customConcept.value || conceptBox.textContent,
-                ratio: selectedRatio,
-                timestamp: new Date().toLocaleString()
-            };
-            
-            posters.push(poster);
-            renderPosters();
-            showNotification('Cinematic poster generated!');
-        });
-
-        // Render posters
-        function renderPosters() {
-            postersGrid.innerHTML = '';
-            
-            posters.forEach(poster => {
-                const posterElement = document.createElement('div');
-                posterElement.className = 'poster-item';
-                posterElement.innerHTML = `
-                    <div class="poster-thumb" style="background-image: url('${poster.image}')">
-                        <i class="fas fa-camera" style="display: none;"></i>
-                    </div>
-                    <div class="poster-actions">
-                        <div class="action-btn download-btn" data-id="${poster.id}">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <div class="action-btn delete-btn" data-id="${poster.id}">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                    </div>
-                    <button class="refine-btn" data-id="${poster.id}">
-                        <i class="fas fa-edit"></i> Refine Poster
-                    </button>
-                `;
-                postersGrid.appendChild(posterElement);
-                
-                // Add event listeners for new elements
-                const thumb = posterElement.querySelector('.poster-thumb');
-                const downloadBtn = posterElement.querySelector('.download-btn');
-                const deleteBtn = posterElement.querySelector('.delete-btn');
-                const refineBtn = posterElement.querySelector('.refine-btn');
-                
-                thumb.addEventListener('click', () => {
-                    fullPreview.src = poster.image;
-                    previewModal.style.display = 'flex';
-                });
-                
-                downloadBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    downloadImage(poster.image, `poster-${poster.id}.png`);
-                });
-                
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    posters = posters.filter(p => p.id !== poster.id);
-                    renderPosters();
-                    showNotification('Poster deleted');
-                });
-                
-                refineBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showNotification('Refine feature activated for this poster');
-                });
-            });
-        }
-
-        // Download image
-        function downloadImage(dataUrl, filename) {
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showNotification('Poster downloaded!');
-        }
-
-        // Modal controls
-        closeModal.addEventListener('click', () => {
-            previewModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === previewModal) {
-                previewModal.style.display = 'none';
-            }
-        });
-
-        // View history
-        viewHistoryBtn.addEventListener('click', () => {
-            showNotification(`Viewing ${posters.length} generated posters`);
-        });
-
-        // Update concept based on custom input
-        customConcept.addEventListener('input', updateConcept);
-
-        function updateConcept() {
-            if (customConcept.value) {
-                conceptBox.textContent = customConcept.value;
-            } else {
-                conceptBox.innerHTML = `"Imagine a sleek smartwatch glowing under stormy skies atop a futuristic cityscape at night. 
-                Rain reflects its luminous interface, symbolizing human resilience against chaos. 
-                The scene evokes a cyberpunk thriller where time is power—each second counts."`;
-            }
-        }
-
-        // Show notification
-        function showNotification(message) {
-            notification.textContent = message;
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-    </script>
+  <script src="./js/app.js" type="module"></script>
 </body>
 </html>
