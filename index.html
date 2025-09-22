@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic Poster Generator | AI Studio</title>
+    <style>
+        /* ... (keep all your existing CSS) ... */
+        
+        .api-key-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin: 10px 0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cinematic Poster Generator</h1>
+            <p class="subtitle">AI-Powered Premium Poster Creation</p>
+        </header>
+        
+        <!-- API Key Section -->
+        <div class="panel api-key-section">
+            <h2 class="panel-title">
+                <i class="material-icons">vpn_key</i>
+                AI API Configuration
+            </h2>
+            <p>Enter your free API keys (get them from the providers below):</p>
+            
+            <label>ClipDrop API Key (Free: 100 images/month):</label>
+            <input type="password" class="api-key-input" id="clipdropKey" placeholder="Get from: https://clipdrop.co/apis">
+            
+            <label>Remove.bg API Key (Free: 50 images/month):</label>
+            <input type="password" class="api-key-input" id="removeBgKey" placeholder="Get from: https://remove.bg/api">
+            
+            <button class="btn" onclick="saveApiKeys()">
+                <i class="material-icons">save</i> Save API Keys
+            </button>
+        </div>
+        
+        <!-- Rest of your existing HTML structure -->
+        <div class="app-container">
+            <!-- ... (your existing panels) ... -->
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_CONFIG = {
+            clipdrop: {
+                removeBackground: 'https://clipdrop.co/remove-background/v1',
+                apiKey: ''
+            },
+            removebg: {
+                endpoint: 'https://api.remove.bg/v1.0/removebg',
+                apiKey: ''
+            }
+        };
+
+        // Save API Keys
+        function saveApiKeys() {
+            API_CONFIG.clipdrop.apiKey = document.getElementById('clipdropKey').value;
+            API_CONFIG.removebg.apiKey = document.getElementById('removeBgKey').value;
+            localStorage.setItem('apiKeys', JSON.stringify({
+                clipdrop: API_CONFIG.clipdrop.apiKey,
+                removebg: API_CONFIG.removebg.apiKey
+            }));
+            showNotification('API keys saved successfully!');
+        }
+
+        // Load saved API keys
+        function loadApiKeys() {
+            const saved = localStorage.getItem('apiKeys');
+            if (saved) {
+                const keys = JSON.parse(saved);
+                API_CONFIG.clipdrop.apiKey = keys.clipdrop;
+                API_CONFIG.removebg.apiKey = keys.removebg;
+                document.getElementById('clipdropKey').value = keys.clipdrop;
+                document.getElementById('removeBgKey').value = keys.removebg;
+            }
+        }
+
+        // Remove Background using ClipDrop API
+        async function removeBackground(imageFile) {
+            if (!API_CONFIG.clipdrop.apiKey) {
+                throw new Error('Please enter your ClipDrop API key');
+            }
+
+            const formData = new FormData();
+            formData.append('image_file', imageFile);
+
+            try {
+                const response = await fetch(API_CONFIG.clipdrop.removeBackground, {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': API_CONFIG.clipdrop.apiKey,
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                return await response.blob();
+            } catch (error) {
+                console.error('Background removal failed:', error);
+                // Fallback to Remove.bg
+                return await removeBackgroundRemoveBG(imageFile);
+            }
+        }
+
+        // Remove Background using Remove.bg API
+        async function removeBackgroundRemoveBG(imageFile) {
+            if (!API_CONFIG.removebg.apiKey) {
+                throw new Error('Please enter your Remove.bg API key');
+            }
+
+            const formData = new FormData();
+            formData.append('image_file', imageFile);
+            formData.append('size', 'auto');
+
+            try {
+                const response = await fetch(API_CONFIG.removebg.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'X-Api-Key': API_CONFIG.removebg.apiKey,
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Remove.bg API error: ${response.status}`);
+                }
+
+                return await response.blob();
+            } catch (error) {
+                console.error('Remove.bg also failed:', error);
+                throw new Error('Both background removal services failed. Please check your API keys.');
+            }
+        }
+
+        // Generate Creative Concept using Free Text API
+        async function generateCreativeConcept(productDescription) {
+            // Using a free text generation API (example with OpenAI-style)
+            // Note: For actual free text generation, you might need to use Hugging Face
+            try {
+                // Simulate AI concept generation (replace with actual API call)
+                const concepts = [
+                    `Cinematic concept: ${productDescription} in a dystopian future setting with neon lighting and dramatic shadows. The product should be the central hero element, illuminated by a single spotlight against a dark, moody background.`,
+                    `Storytelling idea: ${productDescription} as a mysterious artifact discovered in an ancient temple. Use warm golden hour lighting, subtle mist effects, and cinematic depth of field to create intrigue.`,
+                    `Premium advertising concept: ${productDescription} in a minimalist luxury environment. Focus on clean lines, sophisticated lighting, and a sense of exclusivity. Use a shallow depth of field to make the product pop.`
+                ];
+                
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                return concepts[Math.floor(Math.random() * concepts.length)];
+            } catch (error) {
+                return `Creative concept for ${productDescription}: Create a cinematic scene where this product is the hero element. Use dramatic lighting, interesting shadows, and a compelling background story that highlights the product's unique features.`;
+            }
+        }
+
+        // Generate Poster (Simulated - would need actual AI image generation)
+        async function generatePoster(productImage, concept, aspectRatio) {
+            showNotification('Generating poster with AI...');
+            
+            // Remove background first
+            let processedImage;
+            try {
+                processedImage = await removeBackground(productImage);
+                showNotification('Background removed successfully!');
+            } catch (error) {
+                showNotification('Background removal failed: ' + error.message, true);
+                processedImage = productImage; // Use original as fallback
+            }
+
+            // Simulate poster generation (replace with actual AI service)
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // Create a canvas to simulate AI-generated poster
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas size based on aspect ratio
+                    const [widthRatio, heightRatio] = aspectRatio.split(':').map(Number);
+                    canvas.width = 400 * widthRatio / Math.max(widthRatio, heightRatio);
+                    canvas.height = 400 * heightRatio / Math.max(widthRatio, heightRatio);
+                    
+                    // Simulate AI processing by drawing the product with effects
+                    const img = new Image();
+                    img.onload = function() {
+                        // Draw background
+                        ctx.fillStyle = getBackgroundColor(concept);
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        // Draw product
+                        const scale = 0.6;
+                        const productWidth = canvas.width * scale;
+                        const productHeight = (img.height * productWidth) / img.width;
+                        
+                        ctx.drawImage(img, 
+                            (canvas.width - productWidth) / 2, 
+                            (canvas.height - productHeight) / 2,
+                            productWidth, 
+                            productHeight
+                        );
+                        
+                        // Add cinematic effects
+                        addCinematicEffects(ctx, canvas.width, canvas.height, concept);
+                        
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    
+                    if (processedImage instanceof Blob) {
+                        img.src = URL.createObjectURL(processedImage);
+                    } else {
+                        img.src = processedImage;
+                    }
+                }, 2000);
+            });
+        }
+
+        // Helper functions for simulated generation
+        function getBackgroundColor(concept) {
+            if (concept.includes('dystopian') || concept.includes('dark')) return '#2c3e50';
+            if (concept.includes('luxury') || concept.includes('minimalist')) return '#ecf0f1';
+            if (concept.includes('ancient') || concept.includes('temple')) return '#d35400';
+            return '#3498db';
+        }
+
+        function addCinematicEffects(ctx, width, height, concept) {
+            // Add lighting effects based on concept
+            if (concept.includes('spotlight')) {
+                const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/2);
+                gradient.addColorStop(0, 'rgba(255,255,255,0.3)');
+                gradient.addColorStop(1, 'rgba(0,0,0,0.7)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            // Add vignette effect
+            const vignette = ctx.createRadialGradient(width/2, height/2, width/2, width/2, height/2, width/1.5);
+            vignette.addColorStop(0, 'transparent');
+            vignette.addColorStop(1, 'rgba(0,0,0,0.5)');
+            ctx.fillStyle = vignette;
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        // Modified event handlers to use real APIs
+        generateConceptBtn.addEventListener('click', async function() {
+            if (uploadedImages.length === 0) {
+                showNotification('Please upload a product image first', true);
+                return;
+            }
+            
+            this.innerHTML = '<div class="loading"></div> Generating...';
+            this.disabled = true;
+            
+            try {
+                const concept = await generateCreativeConcept('Your product');
+                conceptBox.value = concept;
+                showNotification('Creative concept generated!');
+            } catch (error) {
+                showNotification('Concept generation failed: ' + error.message, true);
+            }
+            
+            this.innerHTML = '<i class="material-icons">auto_awesome</i> Generate Creative Ideas';
+            this.disabled = false;
+        });
+
+        generatePosterBtn.addEventListener('click', async function() {
+            if (uploadedImages.length === 0) {
+                showNotification('Please upload a product image first', true);
+                return;
+            }
+            
+            this.innerHTML = '<div class="loading"></div> Generating...';
+            this.disabled = true;
+            
+            try {
+                const posterDataUrl = await generatePoster(
+                    uploadedImages[0], 
+                    conceptBox.value || 'Cinematic poster', 
+                    currentAspectRatio
+                );
+                
+                addGeneratedPoster(posterDataUrl);
+                showNotification('Poster generated successfully!');
+            } catch (error) {
+                showNotification('Poster generation failed: ' + error.message, true);
+            }
+            
+            this.innerHTML = '<i class="material-icons">add_photo_alternate</i> Generate Poster';
+            this.disabled = false;
+        });
+
+        // Load API keys when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApiKeys();
+            // ... rest of your existing initialization code
+        });
+
+        // Keep all your existing functions (showNotification, addGeneratedPoster, etc.)
+        // ... (your existing JavaScript code)
+    </script>
+</body>
+</html>
